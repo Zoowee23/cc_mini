@@ -6,6 +6,12 @@
   <title>AWS SOC Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="auth.css" />
+  <script>
+    // Guard: redirect to login if no session
+    const _s = JSON.parse(localStorage.getItem('soc_session') || 'null');
+    if (!_s) window.location.replace('login.html');
+  </script>
 </head>
 <body>
 
@@ -24,8 +30,20 @@
       <span>LIVE</span>
     </div>
     <div class="last-updated" id="lastUpdated">Initializing...</div>
+    <div class="user-chip">
+      <div class="user-avatar" id="userAvatar">?</div>
+      <span id="userName"></span>
+      <button class="logout-btn" id="logoutBtn">LOGOUT</button>
+    </div>
   </div>
 </header>
+
+<!-- ── Tabs ── -->
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="overview">📊 Overview</button>
+  <button class="tab-btn" data-tab="logs">📋 Logs</button>
+  <button class="tab-btn" data-tab="threats">🚨 Threats</button>
+</nav>
 
 <!-- ── Main ── -->
 <main class="main">
@@ -33,66 +51,96 @@
   <!-- Error Banner -->
   <div class="error-banner" id="errorBanner">
     <span>⚠</span>
-    <span id="errorMsg">An error occurred while fetching data.</span>
+    <span id="errorMsg">An error occurred.</span>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="stats-grid">
-    <div class="stat-card cyan">
-      <div class="stat-label">Total Events</div>
-      <div class="stat-value" id="statTotal">—</div>
-      <div class="stat-sub">CloudTrail records</div>
-      <div class="stat-icon">📊</div>
-    </div>
-    <div class="stat-card green">
-      <div class="stat-label">Unique IPs</div>
-      <div class="stat-value" id="statIPs">—</div>
-      <div class="stat-sub">Distinct source addresses</div>
-      <div class="stat-icon">🌐</div>
-    </div>
-    <div class="stat-card red">
-      <div class="stat-label">Threat Count</div>
-      <div class="stat-value" id="statThreats">—</div>
-      <div class="stat-sub">IPs with &gt;5 attempts</div>
-      <div class="stat-icon">🚨</div>
-    </div>
-    <div class="stat-card cyan" style="--neon-cyan:#ffd700">
-      <div class="stat-label">Top Event</div>
-      <div class="stat-value" style="font-size:1rem;margin-top:8px;" id="statTopEvent">—</div>
-      <div class="stat-sub">Most frequent action</div>
-      <div class="stat-icon">⚡</div>
-    </div>
-  </div>
+  <!-- ══ TAB: OVERVIEW ══ -->
+  <div class="tab-panel active" id="tab-overview">
 
-  <!-- Charts Row -->
-  <div class="charts-row">
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">Top IP Activity</span>
-        <span class="card-badge">TOP 10</span>
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card cyan">
+        <div class="stat-label">Total Events</div>
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-sub">CloudTrail records</div>
+        <div class="stat-icon">📊</div>
       </div>
-      <div class="card-body">
-        <div class="chart-container" style="height:280px">
-          <canvas id="barChart"></canvas>
+      <div class="stat-card green">
+        <div class="stat-label">Unique IPs</div>
+        <div class="stat-value" id="statIPs">—</div>
+        <div class="stat-sub">Distinct source addresses</div>
+        <div class="stat-icon">🌐</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Threat Count</div>
+        <div class="stat-value" id="statThreats">—</div>
+        <div class="stat-sub">IPs with &gt;5 attempts</div>
+        <div class="stat-icon">🚨</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-label">Top Event</div>
+        <div class="stat-value" style="font-size:1rem;margin-top:8px;" id="statTopEvent">—</div>
+        <div class="stat-sub">Most frequent action</div>
+        <div class="stat-icon">⚡</div>
+      </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Top IP Activity</span>
+          <span class="card-badge">TOP 10</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-container" style="height:260px">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Event Distribution</span>
+          <span class="card-badge">TOP 8</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-container" style="height:260px">
+            <canvas id="pieChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">Event Distribution</span>
-        <span class="card-badge">LIVE</span>
+
+    <!-- Charts Row 2 -->
+    <div class="charts-row">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Activity Timeline</span>
+          <span class="card-badge">LAST 50 EVENTS</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-container" style="height:220px">
+            <canvas id="timelineChart"></canvas>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
-        <div class="chart-container" style="height:280px">
-          <canvas id="pieChart"></canvas>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Event Source Breakdown</span>
+          <span class="card-badge">BY SERVICE</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-container" style="height:220px">
+            <canvas id="sourceChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Bottom Row -->
-  <div class="bottom-row">
-    <!-- Recent Logs Table -->
+  </div><!-- /tab-overview -->
+
+  <!-- ══ TAB: LOGS ══ -->
+  <div class="tab-panel" id="tab-logs">
     <div class="card">
       <div class="card-header">
         <span class="card-title">Recent Logs</span>
@@ -103,20 +151,68 @@
           <table>
             <thead>
               <tr>
+                <th>#</th>
                 <th>Event Name</th>
                 <th>Source IP</th>
                 <th>Timestamp</th>
               </tr>
             </thead>
             <tbody id="logsTableBody">
-              <tr><td colspan="3"><div class="empty-state">Loading...</div></td></tr>
+              <tr><td colspan="4"><div class="empty-state">Loading...</div></td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
+  </div><!-- /tab-logs -->
 
-    <!-- Threat Panel -->
+  <!-- ══ TAB: THREATS ══ -->
+  <div class="tab-panel" id="tab-threats">
+
+    <div class="stats-grid" style="grid-template-columns: repeat(3,1fr)">
+      <div class="stat-card red">
+        <div class="stat-label">HIGH Severity</div>
+        <div class="stat-value" id="threatHigh">—</div>
+        <div class="stat-sub">attempts &gt; 10</div>
+        <div class="stat-icon">🔴</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">MEDIUM Severity</div>
+        <div class="stat-value" id="threatMed">—</div>
+        <div class="stat-sub">attempts 5–10</div>
+        <div class="stat-icon">🟠</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">LOW Severity</div>
+        <div class="stat-value" id="threatLow">—</div>
+        <div class="stat-sub">attempts &lt; 5</div>
+        <div class="stat-icon">🟢</div>
+      </div>
+    </div>
+
+    <div class="charts-row" style="grid-template-columns: 1fr 1fr; margin-bottom:16px">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Threat Severity Distribution</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-container" style="height:240px">
+            <canvas id="threatPieChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Attempts per Threat IP</span>
+        </div>
+        <div class="card-body">
+          <div class="chart-container" style="height:240px">
+            <canvas id="threatBarChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-header">
         <span class="card-title">Threat Intelligence</span>
@@ -128,7 +224,8 @@
         </div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /tab-threats -->
 
 </main>
 

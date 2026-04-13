@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOC Dashboard — Sign Up</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body class="auth-body">
+
+  <div class="auth-bg">
+    <div class="grid-overlay"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+  </div>
+
+  <div class="auth-wrap">
+
+    <div class="auth-brand">
+      <span class="auth-shield">🛡️</span>
+      <div>
+        <div class="auth-brand-title">AWS SOC Dashboard</div>
+        <div class="auth-brand-sub">Real-Time Threat Monitoring System</div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <h2 class="auth-title">Create account</h2>
+        <p class="auth-subtitle">Join your SOC team</p>
+      </div>
+
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-success" id="authSuccess"></div>
+
+      <form class="auth-form" id="signupForm" autocomplete="off">
+        <div class="field-group">
+          <label class="field-label" for="signupName">Full name</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input class="field-input" id="signupName" type="text" placeholder="Jane Analyst" required />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="signupEmail">Email address</label>
+          <div class="field-wrap">
+            <span class="field-icon">✉</span>
+            <input class="field-input" id="signupEmail" type="email" placeholder="analyst@soc.io" required />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="signupPassword">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input class="field-input" id="signupPassword" type="password" placeholder="Min. 8 characters" required minlength="8" />
+            <button type="button" class="toggle-pw" id="togglePw" tabindex="-1">👁</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="signupConfirm">Confirm password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input class="field-input" id="signupConfirm" type="password" placeholder="Repeat password" required />
+          </div>
+        </div>
+
+        <!-- Password strength bar -->
+        <div class="pw-strength">
+          <div class="pw-strength-bar" id="pwStrengthBar"></div>
+        </div>
+        <div class="pw-strength-label" id="pwStrengthLabel"></div>
+
+        <button class="auth-btn" type="submit" id="signupBtn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-loader" id="signupLoader"></span>
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>or</span></div>
+
+      <p class="auth-switch">
+        Already have an account?
+        <a href="login.html" class="auth-link">Sign in</a>
+      </p>
+    </div>
+
+    <p class="auth-footer">Secured · AWS CloudTrail · Athena</p>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>
