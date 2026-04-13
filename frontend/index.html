@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS SOC Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="header">
+  <div class="header-left">
+    <span class="shield-icon">🛡️</span>
+    <div>
+      <h1>AWS SOC Dashboard</h1>
+      <p>Real-Time Threat Monitoring System</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-indicator">
+      <div class="pulse-dot"></div>
+      <span>LIVE</span>
+    </div>
+    <div class="last-updated" id="lastUpdated">Initializing...</div>
+  </div>
+</header>
+
+<!-- ── Main ── -->
+<main class="main">
+
+  <!-- Error Banner -->
+  <div class="error-banner" id="errorBanner">
+    <span>⚠</span>
+    <span id="errorMsg">An error occurred while fetching data.</span>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card cyan">
+      <div class="stat-label">Total Events</div>
+      <div class="stat-value" id="statTotal">—</div>
+      <div class="stat-sub">CloudTrail records</div>
+      <div class="stat-icon">📊</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Unique IPs</div>
+      <div class="stat-value" id="statIPs">—</div>
+      <div class="stat-sub">Distinct source addresses</div>
+      <div class="stat-icon">🌐</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">Threat Count</div>
+      <div class="stat-value" id="statThreats">—</div>
+      <div class="stat-sub">IPs with &gt;5 attempts</div>
+      <div class="stat-icon">🚨</div>
+    </div>
+    <div class="stat-card cyan" style="--neon-cyan:#ffd700">
+      <div class="stat-label">Top Event</div>
+      <div class="stat-value" style="font-size:1rem;margin-top:8px;" id="statTopEvent">—</div>
+      <div class="stat-sub">Most frequent action</div>
+      <div class="stat-icon">⚡</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Top IP Activity</span>
+        <span class="card-badge">TOP 10</span>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="height:280px">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Event Distribution</span>
+        <span class="card-badge">LIVE</span>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="height:280px">
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row -->
+  <div class="bottom-row">
+    <!-- Recent Logs Table -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Recent Logs</span>
+        <span class="card-badge">LAST 50</span>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Event Name</th>
+                <th>Source IP</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody">
+              <tr><td colspan="3"><div class="empty-state">Loading...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Threat Panel -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Threat Intelligence</span>
+        <span class="card-badge" id="threatBadge">0 THREATS</span>
+      </div>
+      <div class="card-body">
+        <div class="threat-list" id="threatList">
+          <div class="empty-state">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
