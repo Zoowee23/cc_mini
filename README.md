@@ -51,7 +51,7 @@ FROM cloudtrail_logs
 CROSS JOIN UNNEST(Records) AS t(r)
 GROUP BY r.sourceIPAddress
 HAVING COUNT(*) > 1
-
+```
 
 
 ## Screenshot
