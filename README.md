@@ -52,5 +52,9 @@ CROSS JOIN UNNEST(Records) AS t(r)
 GROUP BY r.sourceIPAddress
 HAVING COUNT(*) > 1
 
-<img width="1366" height="690" alt="image" src="https://github.com/user-attachments/assets/03f7f48a-5cd3-43fb-91a9-befc13c2edc1" />
+
+
+## Screenshot
+<img width="1366" height="682" alt="image" src="https://github.com/user-attachments/assets/36d6eab5-a531-45da-aaa6-f51dd02559b6" />
+
 
